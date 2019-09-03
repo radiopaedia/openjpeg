@@ -10506,9 +10506,9 @@ static OPJ_BOOL opj_j2k_read_SPCod_SPCoc(opj_j2k_t *p_j2k,
         return OPJ_FALSE;
     }
 
-    opj_read_bytes(l_current_ptr, &l_tccp->numresolutions,
-                   1);              /* SPcox (D) */
-    ++l_tccp->numresolutions;                                                                               /* tccp->numresolutions = read() + 1 */
+    /* SPcod (D) / SPcoc (A) */
+    opj_read_bytes(l_current_ptr, &l_tccp->numresolutions, 1);
+    ++l_tccp->numresolutions;  /* tccp->numresolutions = read() + 1 */
     if (l_tccp->numresolutions > OPJ_J2K_MAXRLVLS) {
         opj_event_msg(p_manager, EVT_ERROR,
                       "Invalid value for numresolutions : %d, max value is set in openjpeg.h at %d\n",
@@ -10529,11 +10529,13 @@ static OPJ_BOOL opj_j2k_read_SPCod_SPCoc(opj_j2k_t *p_j2k,
         return OPJ_FALSE;
     }
 
-    opj_read_bytes(l_current_ptr, &l_tccp->cblkw, 1);               /* SPcoc (E) */
+    /* SPcod (E) / SPcoc (B) */
+    opj_read_bytes(l_current_ptr, &l_tccp->cblkw, 1);
     ++l_current_ptr;
     l_tccp->cblkw += 2;
 
-    opj_read_bytes(l_current_ptr, &l_tccp->cblkh, 1);               /* SPcoc (F) */
+    /* SPcod (F) / SPcoc (C) */
+    opj_read_bytes(l_current_ptr, &l_tccp->cblkh, 1);
     ++l_current_ptr;
     l_tccp->cblkh += 2;
 
@@ -10544,8 +10546,8 @@ static OPJ_BOOL opj_j2k_read_SPCod_SPCoc(opj_j2k_t *p_j2k,
         return OPJ_FALSE;
     }
 
-
-    opj_read_bytes(l_current_ptr, &l_tccp->cblksty, 1);             /* SPcoc (G) */
+    /* SPcod (G) / SPcoc (D) */
+    opj_read_bytes(l_current_ptr, &l_tccp->cblksty, 1);
     ++l_current_ptr;
     if (l_tccp->cblksty & 0xC0U) { /* 2 msb are reserved, assume we can't read */
         opj_event_msg(p_manager, EVT_ERROR,
@@ -10553,7 +10555,8 @@ static OPJ_BOOL opj_j2k_read_SPCod_SPCoc(opj_j2k_t *p_j2k,
         return OPJ_FALSE;
     }
 
-    opj_read_bytes(l_current_ptr, &l_tccp->qmfbid, 1);              /* SPcoc (H) */
+    /* SPcod (H) / SPcoc (E) */
+    opj_read_bytes(l_current_ptr, &l_tccp->qmfbid, 1);
     ++l_current_ptr;
 
     *p_header_size = *p_header_size - 5;
@@ -10565,8 +10568,9 @@ static OPJ_BOOL opj_j2k_read_SPCod_SPCoc(opj_j2k_t *p_j2k,
             return OPJ_FALSE;
         }
 
+        /* SPcod (I_i) / SPcoc (F_i) */
         for (i = 0; i < l_tccp->numresolutions; ++i) {
-            opj_read_bytes(l_current_ptr, &l_tmp, 1);               /* SPcoc (I_i) */
+            opj_read_bytes(l_current_ptr, &l_tmp, 1);
             ++l_current_ptr;
             /* Precinct exponent 0 is only allowed for lowest resolution level (Table A.21) */
             if ((i != 0) && (((l_tmp & 0xf) == 0) || ((l_tmp >> 4) == 0))) {
